@@ -43,19 +43,25 @@ object FirstStepsWithZIO:
     def copyFileZio(source: String, dest: String): Task[Unit] =
       readFileZio(source).flatMap(contents => writeFileZio(dest, contents))
 
-  /** Rewrite the following ZIO code that uses `flatMap` into a _for comprehension_.
+  /** Rewrite the following ZIO code that uses `flatMap` into a `for comprehension`.
     */
   object Exercise4:
 
-    def printLine(line: String) = ZIO.attempt(println(line))
+    def printLine(line: String): Task[Unit] = ZIO.attempt(println(line))
 
-    val readLine = ZIO.attempt(scala.io.StdIn.readLine())
+    val readLine: Task[String] = ZIO.attempt(scala.io.StdIn.readLine())
 
     printLine("What is your name?").flatMap { _ =>
       readLine.flatMap { name =>
         printLine(s"Hello, ${name}!")
       }
     }
+    
+    for
+      _    <- printLine("What is your name?")
+      name <- readLine
+      _    <- printLine(s"Hello, ${name}!")
+    yield ()
 
   /** Rewrite the following ZIO code that uses `flatMap` into a _for comprehension_.
     */
