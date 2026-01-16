@@ -23,10 +23,10 @@ object FirstStepsWithZIO:
       import java.io.*
       val pw = new PrintWriter(new File(file))
       try pw.write(text)
-      finally pw.close
+      finally pw.close()
 
-    def writeFileZio(file: String, text: String) =
-      ???
+    def writeFileZio(file: String, text: String): Task[Unit] =
+      ZIO.attempt(writeFile(file, text))
 
   /** Using the `flatMap` method of ZIO effects, together with the `readFileZio` and `writeFileZio` functions that you
     * wrote, implement a ZIO version of the function `copyFile`.
