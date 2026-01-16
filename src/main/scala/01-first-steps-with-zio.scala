@@ -40,8 +40,8 @@ object FirstStepsWithZIO:
       val contents = readFile(source)
       writeFile(dest, contents)
 
-    def copyFileZio(source: String, dest: String) =
-      ???
+    def copyFileZio(source: String, dest: String): Task[Unit] =
+      readFileZio(source).flatMap(contents => writeFileZio(dest, contents))
 
   /** Rewrite the following ZIO code that uses `flatMap` into a _for comprehension_.
     */
