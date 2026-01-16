@@ -102,7 +102,7 @@ object FirstStepsWithZIO:
         self: ZIO[R, E, A],
         that: ZIO[R, E, B]
     )(f: (A, B) => C): ZIO[R, E, C] =
-      ???
+      ZIO(r => self.run(r).flatMap(a => that.run(r).map(b => f(a, b))))
 
   /** Implement the `collectAll` function in terms of the toy model of a ZIO effect. The function should return an
     * effect that sequentially collects the results of the specified collection of effects.
