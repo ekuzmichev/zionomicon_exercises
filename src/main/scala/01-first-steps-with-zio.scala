@@ -56,22 +56,22 @@ object FirstStepsWithZIO:
         printLine(s"Hello, ${name}!")
       }
     }
-    
+
     for
       _    <- printLine("What is your name?")
       name <- readLine
       _    <- printLine(s"Hello, ${name}!")
     yield ()
 
-  /** Rewrite the following ZIO code that uses `flatMap` into a _for comprehension_.
+  /** Rewrite the following ZIO code that uses `flatMap` into a `for comprehension`.
     */
   object Exercise5:
 
-    val random = ZIO.attempt(scala.util.Random.nextInt(3) + 1)
+    val random: Task[Int] = ZIO.attempt(scala.util.Random.nextInt(3) + 1)
 
-    def printLine(line: String) = ZIO.attempt(println(line))
+    def printLine(line: String): Task[Unit] = ZIO.attempt(println(line))
 
-    val readLine = ZIO.attempt(scala.io.StdIn.readLine())
+    val readLine: Task[String] = ZIO.attempt(scala.io.StdIn.readLine())
 
     random.flatMap { int =>
       printLine("Guess a number from 1 to 3:").flatMap { _ =>
@@ -81,6 +81,15 @@ object FirstStepsWithZIO:
         }
       }
     }
+
+    for
+      int <- random
+      _   <- printLine("Guess a number from 1 to 3:")
+      num <- readLine
+      _ <-
+        if num == int.toString then printLine("You guessed right!")
+        else printLine(s"You guessed wrong, the number was $int!")
+    yield ()
 
   /** Implement the `zipWith` function in terms of the toy model of a ZIO effect. The function should return an effect
     * that sequentially composes the specified effects, merging their results with the specified user-defined function.
