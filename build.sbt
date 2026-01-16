@@ -9,6 +9,6 @@ lazy val root = (project in file("."))
     name := "zionomicon_exercises",
     libraryDependencies ++= Seq(
       "dev.zio" %% "zio"      % zioVersion,
-      "dev.zio" %% "zio-test" % zioVersion % Test
+      "dev.zio" %% "zio-test" % zioVersion
     )
   )
