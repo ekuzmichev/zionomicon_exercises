@@ -111,10 +111,23 @@ object FirstStepsWithZIO:
 
     import Exercise6.*
 
+    // Helper method
+    def succeed[A](a: => A): ZIO[Any, Nothing, A] =
+      ZIO(_ => Right(a))
+
     def collectAll[R, E, A](
         in: Iterable[ZIO[R, E, A]]
     ): ZIO[R, E, List[A]] =
-      ???
+      if in.isEmpty then succeed(Nil)
+      else zipWith(in.head, collectAll(in.tail))(_ :: _)
+
+    // Alternative solution
+    def collectAllV2[R, E, A](
+        in: Iterable[ZIO[R, E, A]]
+    ): ZIO[R, E, List[A]] =
+      in.foldLeft[ZIO[R, E, List[A]]](succeed(Nil)) { case (current, next) =>
+        zipWith(current, next)(_ :+ _)
+      }
 
   /** Implement the `foreach` function in terms of the toy model of a ZIO effect. The function should return an effect
     * that sequentially runs the specified function on every element of the specified collection.
