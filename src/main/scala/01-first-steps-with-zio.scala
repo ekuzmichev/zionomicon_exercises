@@ -275,13 +275,12 @@ object FirstStepsWithZIO:
 
     trait Result
 
-    def doQuery(query: Query)(implicit
-        ec: ExecutionContext
-    ): Future[Result] =
+    // noinspection NotImplementedCode
+    def doQuery(query: Query)(implicit ec: ExecutionContext): Future[Result] =
       ???
 
     def doQueryZio(query: Query): ZIO[Any, Throwable, Result] =
-      ???
+      ZIO.fromFuture(implicit ec => doQuery(query))
 
   /** Using the `Console`, write a little program that asks the user what their name is, and then prints it out to them
     * with a greeting.
