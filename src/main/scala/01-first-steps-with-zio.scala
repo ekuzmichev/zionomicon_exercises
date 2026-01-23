@@ -177,7 +177,8 @@ object FirstStepsWithZIO:
     */
   object Exercise10:
 
-    import java.io.IOException
+    import Exercise1.*
+    import Exercise4.*
 
     object Cat extends ZIOAppDefault:
 
@@ -187,8 +188,8 @@ object FirstStepsWithZIO:
           _    <- cat(args)
         yield ()
 
-      def cat(files: Chunk[String]): ZIO[Any, IOException, Unit] =
-        ???
+      def cat(files: Chunk[String]) =
+        ZIO.foreach(files)(file => readFileZio(file).flatMap(printLine))
 
   /** Using `ZIO.fail` and `ZIO.succeed`, implement the following function, which converts an `Either` into a ZIO
     * effect:
