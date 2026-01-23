@@ -222,6 +222,7 @@ object FirstStepsWithZIO:
     */
   object Exercise14:
 
+    // noinspection NotImplementedCode
     def getCacheValue(
         key: String,
         onSuccess: String => Unit,
@@ -230,7 +231,9 @@ object FirstStepsWithZIO:
       ???
 
     def getCacheValueZio(key: String): ZIO[Any, Throwable, String] =
-      ???
+      ZIO.async { callback =>
+        getCacheValue(key, success => callback(ZIO.succeed(success)), failure => ZIO.fail(failure))
+      }
 
   /** Using `ZIO.async`, convert the following asynchronous, callback-based function into a ZIO function:
     */
