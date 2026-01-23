@@ -289,7 +289,11 @@ object FirstStepsWithZIO:
 
     object HelloHuman extends ZIOAppDefault:
       val run =
-        ???
+        for
+          _    <- Console.printLine("Hi! What is your name?")
+          name <- Console.readLine
+          _    <- Console.printLine(s"Welcome, $name!")
+        yield ()
 
   /** Using the `Console` and `Random` services in ZIO, write a little program that asks the user to guess a randomly
     * chosen number between 1 and 3, and prints out if they were correct or not.
