@@ -140,6 +140,11 @@ object FirstStepsWithZIO:
     def foreach[R, E, A, B](
         in: Iterable[A]
     )(f: A => ZIO[R, E, B]): ZIO[R, E, List[B]] =
+      collectAll(in.map(f))
+
+    def foreachV2[R, E, A, B](
+        in: Iterable[A]
+    )(f: A => ZIO[R, E, B]): ZIO[R, E, List[B]] =
       if in.isEmpty then succeed(Nil)
       else zipWith(f(in.head), foreach(in.tail)(f))(_ :: _)
 
@@ -153,8 +158,10 @@ object FirstStepsWithZIO:
     def orElse[R, E1, E2, A](
         self: ZIO[R, E1, A],
         that: ZIO[R, E2, A]
-    ): ZIO[R, E2, A] =
-      ???
+    ): ZIO[R, E2, A] = ???
+//      ZIO{ r =>
+//        self.run(r).orElse(that.run(r))
+//      }
 
   /** Using the following code as a foundation, write a ZIO application that prints out the contents of whatever files
     * are passed into the program as command-line arguments. You should use the function `readFileZio` that you
