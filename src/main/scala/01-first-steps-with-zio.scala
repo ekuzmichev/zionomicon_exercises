@@ -232,7 +232,11 @@ object FirstStepsWithZIO:
 
     def getCacheValueZio(key: String): ZIO[Any, Throwable, String] =
       ZIO.async { callback =>
-        getCacheValue(key, success => callback(ZIO.succeed(success)), failure => ZIO.fail(failure))
+        getCacheValue(
+          key,
+          success => callback(ZIO.succeed(success)),
+          failure => ZIO.fail(failure)
+        )
       }
 
   /** Using `ZIO.async`, convert the following asynchronous, callback-based function into a ZIO function:
@@ -241,6 +245,7 @@ object FirstStepsWithZIO:
 
     trait User
 
+    // noinspection NotImplementedCode
     def saveUserRecord(
         user: User,
         onSuccess: () => Unit,
@@ -249,7 +254,16 @@ object FirstStepsWithZIO:
       ???
 
     def saveUserRecordZio(user: User): ZIO[Any, Throwable, Unit] =
-      ???
+      ZIO.async { callback =>
+        saveUserRecord(
+          user,
+          // Here is parameterless function needed: () => ...
+          // Writing _ => ... instead produces an error: "Wrong number of parameters, expected: 0"
+          // It is because _ => ... is a 1-parameter function
+          () => callback(ZIO.unit),
+          failure => ZIO.fail(failure)
+        )
+      }
 
   /** Using `ZIO.fromFuture`, convert the following code to ZIO:
     */
