@@ -197,7 +197,7 @@ object FirstStepsWithZIO:
   object Exercise11:
 
     def eitherToZIO[E, A](either: Either[E, A]): ZIO[Any, E, A] =
-      ???
+      either.fold(ZIO.fail, ZIO.succeed)
 
   /** Using `ZIO.fail` and `ZIO.succeed`, implement the following function, which converts a `List` into a ZIO effect,
     * by looking at the head element in the list and ignoring the rest of the elements.
