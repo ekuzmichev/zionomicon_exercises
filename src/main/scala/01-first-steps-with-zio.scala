@@ -207,7 +207,7 @@ object FirstStepsWithZIO:
   object Exercise12:
 
     def listToZIO[A](list: List[A]): ZIO[Any, None.type, A] =
-      ???
+      list.headOption.fold(ZIO.fail(None))(ZIO.succeed)
 
   /** Using `ZIO.succeed`, convert the following procedural function into a ZIO function:
     */
