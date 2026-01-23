@@ -339,4 +339,7 @@ object FirstStepsWithZIO:
     def doUntil[R, E, A](
         body: ZIO[R, E, A]
     )(condition: A => Boolean): ZIO[R, E, A] =
-      ???
+      body.flatMap { a =>
+        if condition(a) then doUntil(body)(condition)
+        else ZIO.succeed(a)
+      }
