@@ -325,7 +325,11 @@ object FirstStepsWithZIO:
     def readUntil(
         acceptInput: String => Boolean
     ): ZIO[Console, IOException, String] =
-      ???
+      for
+        _     <- Console.printLine("Guess the string!")
+        input <- Console.readLine
+        _     <- if acceptInput(input) then Console.printLine("You've done this!") else readUntil(acceptInput)
+      yield input
 
   /** Using recursion, write a function that will continue evaluating the specified effect, until the specified
     * user-defined function evaluates to `true` on the output of the effect.
