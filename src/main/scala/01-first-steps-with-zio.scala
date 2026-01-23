@@ -216,7 +216,7 @@ object FirstStepsWithZIO:
     def currentTime(): Long = java.lang.System.currentTimeMillis()
 
     lazy val currentTimeZIO: ZIO[Any, Nothing, Long] =
-      ???
+      ZIO.succeed(currentTime())
 
   /** Using `ZIO.async`, convert the following asynchronous, callback-based function into a ZIO function:
     */
