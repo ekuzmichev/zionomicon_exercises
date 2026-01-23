@@ -1,5 +1,7 @@
 import zio.*
 
+import scala.util.{Failure, Success, Try}
+
 //noinspection ScalaFileName, ScalaWeakerAccess, SimplifyZipRightInspection
 //noinspection UnusedZIOExpressionsInspection, TypeAnnotation, AccessorLikeMethodIsUnit
 object FirstStepsWithZIO:
@@ -302,7 +304,16 @@ object FirstStepsWithZIO:
 
     object NumberGuessing extends ZIOAppDefault:
       val run =
-        ???
+        for
+          target <- Random.nextIntBetween(1, 4)
+          _      <- Console.printLine("Guess the number from 1 to 3:")
+          input  <- Console.readLine
+          result = input.toIntOption match
+            case Some(guess) if guess == target => "You are right!"
+            case Some(_)                        => "You are wrong!"
+            case None                           => s"$input is not a number"
+          _ <- Console.printLine(result)
+        yield ()
 
   /** Using the `Console` service and recursion, write a function that will repeatedly read input from the console until
     * the specified user-defined function evaluates to `true` on the input.
