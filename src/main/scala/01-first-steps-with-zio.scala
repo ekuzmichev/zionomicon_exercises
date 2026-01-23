@@ -2,6 +2,15 @@ import zio.*
 
 object FirstStepsWithZIO:
 
+  object ZioToyModel:
+    final case class ZIO[-R, +E, +A](run: R => Either[E, A])
+
+    def succeed[A](a: => A): ZIO[Any, Nothing, A] =
+      ZIO(_ => Right(a))
+
+    def fail[E](e: => E): ZIO[Any, E, Nothing] =
+      ZIO(_ => Left(e))
+
   /** Implement a ZIO version of the function `readFile` by using the `ZIO.attempt` constructor.
     */
   object Exercise1:
@@ -95,8 +104,7 @@ object FirstStepsWithZIO:
     * that sequentially composes the specified effects, merging their results with the specified user-defined function.
     */
   object Exercise6:
-
-    final case class ZIO[-R, +E, +A](run: R => Either[E, A])
+    import ZioToyModel.*
 
     def zipWith[R, E, A, B, C](
         self: ZIO[R, E, A],
@@ -110,10 +118,7 @@ object FirstStepsWithZIO:
   object Exercise7:
 
     import Exercise6.*
-
-    // Helper method
-    def succeed[A](a: => A): ZIO[Any, Nothing, A] =
-      ZIO(_ => Right(a))
+    import ZioToyModel.*
 
     def collectAll[R, E, A](
         in: Iterable[ZIO[R, E, A]]
@@ -136,6 +141,7 @@ object FirstStepsWithZIO:
 
     import Exercise6.*
     import Exercise7.*
+    import ZioToyModel.*
 
     def foreach[R, E, A, B](
         in: Iterable[A]
@@ -153,15 +159,17 @@ object FirstStepsWithZIO:
     */
   object Exercise9:
 
-    import Exercise6.*
+    import ZioToyModel.*
 
     def orElse[R, E1, E2, A](
         self: ZIO[R, E1, A],
         that: ZIO[R, E2, A]
-    ): ZIO[R, E2, A] = ???
-//      ZIO{ r =>
-//        self.run(r).orElse(that.run(r))
-//      }
+    ): ZIO[R, E2, A] =
+      ZIO { r =>
+        self.run(r) match
+          case Right(a) => Right(a)
+          case Left(e1) => that.run(r)
+      }
 
   /** Using the following code as a foundation, write a ZIO application that prints out the contents of whatever files
     * are passed into the program as command-line arguments. You should use the function `readFileZio` that you
