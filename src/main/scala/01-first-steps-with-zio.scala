@@ -135,11 +135,13 @@ object FirstStepsWithZIO:
   object Exercise8:
 
     import Exercise6.*
+    import Exercise7.*
 
     def foreach[R, E, A, B](
         in: Iterable[A]
     )(f: A => ZIO[R, E, B]): ZIO[R, E, List[B]] =
-      ???
+      if in.isEmpty then succeed(Nil)
+      else zipWith(f(in.head), foreach(in.tail)(f))(_ :: _)
 
   /** Implement the `orElse` function in terms of the toy model of a ZIO effect. The function should return an effect
     * that tries the left hand side, but if that effect fails, it will fallback to the effect on the right hand side.
