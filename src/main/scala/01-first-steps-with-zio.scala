@@ -1,5 +1,7 @@
 import zio.*
 
+//noinspection ScalaFileName, ScalaWeakerAccess, SimplifyZipRightInspection
+//noinspection UnusedZIOExpressionsInspection, TypeAnnotation, AccessorLikeMethodIsUnit
 object FirstStepsWithZIO:
 
   object ZioToyModel:
@@ -62,14 +64,14 @@ object FirstStepsWithZIO:
 
     printLine("What is your name?").flatMap { _ =>
       readLine.flatMap { name =>
-        printLine(s"Hello, ${name}!")
+        printLine(s"Hello, $name!")
       }
     }
 
     for
       _    <- printLine("What is your name?")
       name <- readLine
-      _    <- printLine(s"Hello, ${name}!")
+      _    <- printLine(s"Hello, $name!")
     yield ()
 
   /** Rewrite the following ZIO code that uses `flatMap` into a `for comprehension`.
