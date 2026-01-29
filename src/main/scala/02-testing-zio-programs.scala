@@ -1,10 +1,12 @@
-/**   1. Write a ZIO program that simulates a countdown timer (e.g., prints numbers from 5 to 1, with a 1-second delay
-  *      between each). Test this program using TestClock.
-  */
 import zio.*
 import zio.test.*
 import zio.test.Assertion.*
 
+import java.util.concurrent.TimeUnit
+
+/**   1. Write a ZIO program that simulates a countdown timer (e.g., prints numbers from 5 to 1, with a 1-second delay
+  *      between each). Test this program using TestClock.
+  */
 //noinspection SimplifyUnlessInspection
 object CountdownTimer extends ZIOSpecDefault:
   def countdown(n: Int): ZIO[Any, Nothing, Unit] =
@@ -40,15 +42,111 @@ object CountdownTimer extends ZIOSpecDefault:
   * cache and tries to retrieve them. Write tests using `TestClock` to verify that items are available before expiration
   * and unavailable after expiration.
   */
+//noinspection ScalaWeakerAccess, TypeAnnotation, SimplifyAssertInspection
 object CacheWithExpiration extends ZIOSpecDefault:
 
+  case class CacheEntry[V](value: V, expirationTime: Long)
+
+  class Cache[K, V](storageMapRef: Ref[Map[K, CacheEntry[V]]], expiration: Long):
+
+    def printLine(s: => String): ZIO[Any, Nothing, Unit] = Console.printLine(s).orDie
+
+    def put(key: K, value: V): ZIO[Any, Nothing, Unit] =
+      for
+        currentTime <- Clock.currentTime(TimeUnit.MILLISECONDS)
+
+        expirationTime = currentTime + expiration
+
+        _ <- printLine(
+          s"Putting value=$value by key=$key into cache; " +
+            s"currentTime=$currentTime, expirationTime=$expirationTime millis}"
+        )
+
+        _ <- storageMapRef.update(_ + (key -> CacheEntry(value, expirationTime)))
+
+        storageMap <- storageMapRef.get
+
+        _ <- printLine(
+          s"Put value=$value by key=$key to cache. " +
+            s"Current cache state: $storageMap"
+        )
+      yield ()
+
+    def get(key: K): ZIO[Any, Nothing, Option[V]] =
+      for
+        currentTime <- Clock.currentTime(TimeUnit.MILLISECONDS)
+
+        storageMap <- storageMapRef.get
+
+        _ <- printLine(
+          s"Getting value from cache by key=$key. " +
+            s"Current cache state: $storageMap; currentTime=$currentTime"
+        )
+
+        result = storageMap.get(key) match
+          case Some(entry) if entry.expirationTime > currentTime =>
+            Some(entry.value)
+          case _ =>
+            None
+
+        _ <- printLine(s"Got value from cache: $result by key=$key")
+
+        _ <- storageMapRef.update(_.filter { case (_, entry) => entry.expirationTime > currentTime })
+
+        cleanedUpStorageMap <- storageMapRef.get
+
+        _ <- printLine(
+          s"Cleaned up expired values. " +
+            s"Cache state after cleanup: $cleanedUpStorageMap"
+        )
+      yield result
+
+  object Cache:
+    def make[K, V](expiration: Duration): ZIO[Any, Nothing, Cache[K, V]] =
+      Ref.make(Map.empty[K, CacheEntry[V]]).map(new Cache[K, V](_, expiration.toMillis))
+
   override def spec =
+    val key   = "foo"
+    val value = 42
+
     suite("Cache With Expiration Spec")(
       test("should store and retrieve items before expiration") {
-        ???
+        for
+          cache     <- Cache.make[String, Int](1.minute)
+          _         <- cache.put(key, value)
+          _         <- TestClock.adjust(10.seconds)
+          readValue <- cache.get(key)
+        yield assert(readValue)(isSome(equalTo(value)))
       },
       test("should not retrieve items after expiration") {
-        ???
+        for
+          cache <- Cache.make[String, Int](1.minute)
+          _     <- cache.put(key, value)
+          _     <- TestClock.adjust(65.seconds)
+          value <- cache.get(key)
+        yield assert(value)(isNone)
+      },
+      test("should handle multiple items with different expiration times") {
+        for
+          cache  <- Cache.make[String, Int](2.minutes)      // 2 minutes expiration
+          _      <- cache.put("foo", 42)
+          _      <- TestClock.adjust(1.minute)              // 1 minute passed
+          _      <- cache.put("bar", 21)                    // This will expire 1 minute after foo
+          _      <- TestClock.adjust(1.minute + 30.seconds) // Total 2 minutes 30 seconds passed
+          value1 <- cache.get("foo")                        // Should be expired
+          value2 <- cache.get("bar")                        // Should still be valid
+        yield assert(value1)(isNone) && assert(value2)(isSome(equalTo(21)))
+      },
+      test("should overwrite existing keys with new expiration time") {
+        for
+          cache <- Cache.make[String, Int](1.minute) // 1 minute expiration
+          _     <- cache.put("foo", 42)
+          _     <- TestClock.adjust(59.seconds)      // Almost expired
+          _     <- cache.put("foo", 21)              // Reset expiration
+          _ <-
+            TestClock.adjust(31.seconds) // Total 1 minute 30 seconds from first put
+          value <- cache.get("foo")
+        yield assert(value)(isSome(equalTo(21)))
       }
     )
 
@@ -58,7 +156,10 @@ object CacheWithExpiration extends ZIOSpecDefault:
   */
 object RateLimiterSpec extends ZIOSpecDefault:
 
-  type RateLimiter
+  class RateLimiter(currentOperationCountRef: Ref[Int], maxOperationsPerMinute: Int):
+    def submit[R, E, A](zio: ZIO[R, E, A]): ZIO[R, E, A] =
+      for currentOperationCount <- currentOperationCountRef.get
+      yield ???
 
   override def spec =
     suite("Rate Limiter Spec")(
