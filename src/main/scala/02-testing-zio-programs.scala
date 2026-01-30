@@ -5,7 +5,7 @@ import zio.test.Assertion.*
 import java.time.Instant
 import java.util.concurrent.TimeUnit
 
-/**   1. Write a ZIO program that simulates a countdown timer (e.g., prints numbers from 5 to 1, with a 1-second delay
+/** 1) Write a ZIO program that simulates a countdown timer (e.g., prints numbers from 5 to 1, with a 1-second delay
   * between each). Test this program using TestClock.
   */
 //noinspection SimplifyUnlessInspection,ScalaWeakerAccess
@@ -40,7 +40,7 @@ object CountdownTimer extends ZIOSpecDefault:
     )
 end CountdownTimer
 
-/** 2. Create a simple cache that expires entries after a certain duration. Implement a program that adds items to the
+/** 2) Create a simple cache that expires entries after a certain duration. Implement a program that adds items to the
   * cache and tries to retrieve them. Write tests using `TestClock` to verify that items are available before expiration
   * and unavailable after expiration.
   */
@@ -153,7 +153,7 @@ object CacheWithExpiration extends ZIOSpecDefault:
     )
 end CacheWithExpiration
 
-/** 3. Create a rate limiter that allows a maximum of N operations per minute. Implement a program that uses this rate
+/** 3) Create a rate limiter that allows a maximum of N operations per minute. Implement a program that uses this rate
   * limiter. Write tests using `TestClock` to verify that the rate limiter correctly allows or blocks operations based
   * on the time window.
   */
@@ -270,7 +270,7 @@ object RateLimiterSpec extends ZIOSpecDefault:
     )
 end RateLimiterSpec
 
-/** 4. Implement a function that reverses a list, then write a property-based test to verify that reversing a list twice
+/** 4) Implement a function that reverses a list, then write a property-based test to verify that reversing a list twice
   * returns the original list.
   */
 object ReverseListSpec extends ZIOSpecDefault:
@@ -283,7 +283,7 @@ object ReverseListSpec extends ZIOSpecDefault:
       }
     )
 
-/** 5. Implement an AVL tree (self-balancing binary search tree) with insert and delete operations. Write property-based
+/** 5) Implement an AVL tree (self-balancing binary search tree) with insert and delete operations. Write property-based
   * tests to verify that the tree remains balanced after each operation. A balanced tree is one where the height of
   * every node's left and right subtrees differs by at most one.
   */
