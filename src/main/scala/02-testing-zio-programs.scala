@@ -1,9 +1,11 @@
 import zio.*
 import zio.test.*
 import zio.test.Assertion.*
+import zio.test.Gen.*
 
 import java.time.Instant
 import java.util.concurrent.TimeUnit
+import scala.annotation.tailrec
 
 /** 1) Write a ZIO program that simulates a countdown timer (e.g., prints numbers from 5 to 1, with a 1-second delay
   * between each). Test this program using TestClock.
@@ -273,15 +275,23 @@ end RateLimiterSpec
 /** 4) Implement a function that reverses a list, then write a property-based test to verify that reversing a list twice
   * returns the original list.
   */
+//noinspection ScalaWeakerAccess,SimplifyAssertInspection,TypeAnnotation
 object ReverseListSpec extends ZIOSpecDefault:
-  def reverseList[A](list: List[A]): List[A] = ???
+  def reverseList[A](list: List[A]): List[A] =
+    @tailrec
+    def reverse(acc: List[A], remaining: List[A]): List[A] =
+      remaining match
+        case Nil     => acc
+        case x :: xs => reverse(x :: acc, xs)
+    reverse(Nil, list)
 
   override def spec =
     suite("Reverse List Spec")(
       test("reversing a list twice returns the original list") {
-        ???
+        check(Gen.listOf(Gen.int)) { list => assert(reverseList(reverseList(list)))(equalTo(list)) }
       }
     )
+end ReverseListSpec
 
 /** 5) Implement an AVL tree (self-balancing binary search tree) with insert and delete operations. Write property-based
   * tests to verify that the tree remains balanced after each operation. A balanced tree is one where the height of
