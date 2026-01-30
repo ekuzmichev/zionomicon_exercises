@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit
 /**   1. Write a ZIO program that simulates a countdown timer (e.g., prints numbers from 5 to 1, with a 1-second delay
   * between each). Test this program using TestClock.
   */
-//noinspection SimplifyUnlessInspection
+//noinspection SimplifyUnlessInspection,ScalaWeakerAccess
 object CountdownTimer extends ZIOSpecDefault:
   def countdown(n: Int): ZIO[Any, Nothing, Unit] =
     if n <= 0 then ZIO.unit
@@ -38,12 +38,13 @@ object CountdownTimer extends ZIOSpecDefault:
         )
       }
     )
+end CountdownTimer
 
 /** 2. Create a simple cache that expires entries after a certain duration. Implement a program that adds items to the
   * cache and tries to retrieve them. Write tests using `TestClock` to verify that items are available before expiration
   * and unavailable after expiration.
   */
-//noinspection ScalaWeakerAccess, TypeAnnotation, SimplifyAssertInspection
+//noinspection ScalaWeakerAccess,TypeAnnotation,SimplifyAssertInspection
 object CacheWithExpiration extends ZIOSpecDefault:
 
   case class CacheEntry[V](value: V, expirationTime: Long)
@@ -150,6 +151,7 @@ object CacheWithExpiration extends ZIOSpecDefault:
         yield assert(value)(isSome(equalTo(21)))
       }
     )
+end CacheWithExpiration
 
 /** 3. Create a rate limiter that allows a maximum of N operations per minute. Implement a program that uses this rate
   * limiter. Write tests using `TestClock` to verify that the rate limiter correctly allows or blocks operations based
