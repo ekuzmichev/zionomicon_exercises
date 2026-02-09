@@ -38,7 +38,10 @@ object TheZIOErrorModel:
   object Exercise3:
 
     def logFailures[R, E, A](zio: ZIO[R, E, A]): ZIO[R, E, A] =
-      ???
+      zio.foldCauseZIO(
+        cause => ZIO.succeed(println(cause.prettyPrint)) *> ZIO.failCause(cause),
+        a => ZIO.succeed(a)
+      )
 
   /** 4. Using the `ZIO#exit` method, which "runs" an effect to an `Exit` value, implement the following function, which
     * will execute the specified effect on any failure at all:
