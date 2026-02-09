@@ -1,6 +1,6 @@
 import zio.*
 
-//noinspection ScalaFileName,TypeAnnotation
+//noinspection ScalaFileName,TypeAnnotation,SimplifySucceedEitherInspection
 object TheZIOErrorModel:
 
   /**   1. Using the appropriate effect constructor, fix the following function so that it no longer fails with defects
@@ -83,12 +83,24 @@ object TheZIOErrorModel:
     def left[R, E, A, B](
         zio: ZIO[R, E, Either[A, B]]
     ): ZIO[R, Either[E, B], A] =
-      ???
+      zio.foldZIO(
+        e => ZIO.fail(Left(e)),
+        {
+          case Left(a)  => ZIO.succeed(a)
+          case Right(b) => ZIO.fail(Right(b))
+        }
+      )
 
     def unleft[R, E, A, B](
         zio: ZIO[R, Either[E, B], A]
     ): ZIO[R, E, Either[A, B]] =
-      ???
+      zio.foldZIO(
+        {
+          case Left(e)  => ZIO.fail(e)
+          case Right(b) => ZIO.succeed(Right(b))
+        },
+        a => ZIO.succeed(Left(a))
+      )
 
   /** 8. Using the `ZIO#foldZIO` method, implement the following two functions, which make working with `Either` values
     * easier, by shifting the unexpected case into the error channel (and reversing this shifting).
