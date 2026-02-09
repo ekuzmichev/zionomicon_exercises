@@ -65,7 +65,7 @@ object TheZIOErrorModel:
     def ioException[R, A](
         zio: ZIO[R, Throwable, A]
     ): ZIO[R, java.io.IOException, A] =
-      ???
+      zio.refineOrDie { case e: java.io.IOException => e }
 
   /** 6. Using the `ZIO#refineToOrDie` method, narrow the error type of the following effect to just
     * `NumberFormatException`.
