@@ -52,7 +52,10 @@ object TheZIOErrorModel:
         zio: ZIO[R, E, A],
         handler: ZIO[R, E, Any]
     ): ZIO[R, E, A] =
-      ???
+      zio.exit.flatMap {
+        case Exit.Success(a)     => ZIO.succeed(a)
+        case Exit.Failure(cause) => handler *> ZIO.failCause(cause)
+      }
 
   /** 5. Using the `ZIO#refineOrDie` method, implement the `ioException` function, which refines the error channel to
     * only include the `IOException` error.
