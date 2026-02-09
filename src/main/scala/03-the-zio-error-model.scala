@@ -110,12 +110,24 @@ object TheZIOErrorModel:
     def right[R, E, A, B](
         zio: ZIO[R, E, Either[A, B]]
     ): ZIO[R, Either[E, A], B] =
-      ???
+      zio.foldZIO(
+        e => ZIO.fail(Left(e)),
+        {
+          case Left(a)  => ZIO.fail(Right(a))
+          case Right(b) => ZIO.succeed(b)
+        }
+      )
 
     def unright[R, E, A, B](
         zio: ZIO[R, Either[E, A], B]
     ): ZIO[R, E, Either[A, B]] =
-      ???
+      zio.foldZIO(
+        {
+          case Left(e)  => ZIO.fail(e)
+          case Right(a) => ZIO.succeed(Left(a))
+        },
+        b => ZIO.succeed(Right(b))
+      )
 
   /** 9. Using the `ZIO#sandbox` method, implement the following function.
     */
