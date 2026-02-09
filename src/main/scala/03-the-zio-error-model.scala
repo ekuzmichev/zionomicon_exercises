@@ -1,5 +1,6 @@
 import zio.*
 
+//noinspection ScalaFileName,TypeAnnotation
 object TheZIOErrorModel:
 
   /**   1. Using the appropriate effect constructor, fix the following function so that it no longer fails with defects
@@ -22,7 +23,13 @@ object TheZIOErrorModel:
     def recoverFromSomeDefects[R, E, A](zio: ZIO[R, E, A])(
         f: Throwable => Option[A]
     ): ZIO[R, E, A] =
-      ???
+      zio.foldCauseZIO(
+        cause =>
+          cause.defects
+            .collectFirst(Function.unlift(f))
+            .fold[ZIO[R, E, A]](ZIO.failCause(cause))(a => ZIO.succeed(a)),
+        a => ZIO.succeed(a)
+      )
 
   /** 3. Using the `ZIO#foldCauseZIO` operator and the `Cause#prettyPrint` method, implement an operator that takes an
     * effect, and returns a new effect that logs any failures of the original effect (including errors and defects),
