@@ -72,8 +72,8 @@ object TheZIOErrorModel:
     */
   object Exercise6:
 
-    val parseNumber: ZIO[Any, Throwable, Int] =
-      ZIO.attempt("foo".toInt)
+    val parseNumber: ZIO[Any, /* Throwable => */ NumberFormatException, Int] =
+      ZIO.attempt("foo".toInt).refineToOrDie[NumberFormatException]
 
   /** 7. Using the `ZIO#foldZIO` method, implement the following two functions, which make working with `Either` values
     * easier, by shifting the unexpected case into the error channel (and reversing this shifting).
